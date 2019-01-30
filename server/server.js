@@ -1,5 +1,6 @@
 var express = require('express')
 var bodyParser = require('body-parser')
+const {ObjectId} = require('mongodb')
 
 var {mongoose} = require('./db/mongoose')
 var {Todo} = require('./models/todo')
@@ -10,7 +11,8 @@ var app = express()
 // Middleware
 app.use(bodyParser.json())
 
-// Routes
+// ---- Routes
+// POST a todo
 app.post('/todos', (req, res) => {
     // console.log(req.body)
     var todo = new Todo({
@@ -24,7 +26,7 @@ app.post('/todos', (req, res) => {
     })
 })
 
-
+// GET  all todos
 app.get('/todos', (req, res) => {
     Todo.find().then((todos) => {
         res.send({todos})
@@ -32,6 +34,33 @@ app.get('/todos', (req, res) => {
         res.status(400).send(e)
     })
 })
+
+// GET one todo by id
+
+app.get('/todos/:id', (req, res) => {
+    var id = req.params.id
+    // res.send(id)
+    // Validate ID using
+    if(!ObjectId.isValid(id)){
+        // Status 404 - empty body
+        return res.status(404).send('not valid id')
+    }
+
+    // Find by ID 
+    Todo.findById(id).then((todo)=> {
+        // if there is no todo - status 404 - empty body
+        if(!todo){
+            return res.status(404).send('not found id in db')
+        }
+        // success
+        // if there is todo - send it back
+        res.send({todo})
+    }, (e) => {
+        // error - status 400 - empty body
+        res.status(400).send()
+    })
+})
+
 
 app.listen(3000, () => {
     console.log('Started on port 3000')
