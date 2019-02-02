@@ -1,6 +1,6 @@
 var mongoose = require('mongoose')
 
-const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/TodoApp'
+const url = process.env.MONGODB_URI
 mongoose.connect(url, {useNewUrlParser: true})
 
 module.exports = {
